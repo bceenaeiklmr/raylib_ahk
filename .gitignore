@@ -1,4 +1,10 @@
-# test and demo output
+﻿# test and demo output
 tests/out/
 examples/*.png
 *.log
+
+# build intermediates
+build/
+__pycache__/
+*.obj
+*.exp

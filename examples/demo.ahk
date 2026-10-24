@@ -1,11 +1,11 @@
-; Interactive demo for lib\raylib.ahk: a ball with gravity that you can nudge and
+﻿; Interactive demo for lib\raylib.ahk: a ball with gravity that you can nudge and
 ; fling. Also runs headless-safe for automation:
 ;
 ;   & 'C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe' /ErrorStdOut examples\demo.ahk
-;   & 'C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe' /ErrorStdOut examples\demo.ahk /auto:2000 /shot:demo.png
+;   & 'C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe' /ErrorStdOut examples\demo.ahk /auto:2000 /shot:demo
 ;
 ; /auto[:ms]  close the window by itself (default 3000 ms)
-; /shot:name  write name.png from the framebuffer just before closing
+; /shot:name  write tests\out\name.png just before closing
 #Requires AutoHotkey v2.0
 #Warn All, StdOut
 #SingleInstance Force
@@ -21,8 +21,17 @@ for Arg in A_Args {
         AutoExit := Colon ? Integer(SubStr(Arg, Colon + 1)) : 3000
     } else if (SubStr(Arg, 1, 5) = "/shot") {
         Colon := InStr(Arg, ":")
-        ShotName := Colon ? SubStr(Arg, Colon + 1) : "demo.png"
+        ShotName := Colon ? SubStr(Arg, Colon + 1) : "demo"
     }
+}
+if (ShotName != "" && !InStr(ShotName, "."))
+    ShotName .= ".png"   ; raylib picks the format from the extension
+ShotPath := ""
+if (ShotName != "") {
+    ; Set the directory before InitWindow (raylib keeps a copy of it) and let
+    ; A_WorkingDir resolve the "..", so the path handed to ScreenShot is plain.
+    SetWorkingDir A_ScriptDir "\..\tests\out"
+    ShotPath := A_WorkingDir "\" ShotName
 }
 
 Width := 960, Height := 540
@@ -124,11 +133,11 @@ while !RL.WindowShouldClose() {
     RenderFrame(Dt)
 
     if (AutoExit && A_TickCount - StartTick >= AutoExit) {
-        if (ShotName != "") {
-            ; raylib flushes its draw batch inside EndDrawing() and the readback
-            ; is one buffer swap behind, so draw twice and shot after the second.
+        if (ShotPath != "") {
+            ; ScreenShot() takes a full path; TakeScreenshot() only accepts a bare
+            ; name and writes it beside wherever the process was started.
             RenderFrame(Dt)
-            RL.TakeScreenshot(ShotName)
+            RL.ScreenShot(ShotPath)
         }
         break
     }
