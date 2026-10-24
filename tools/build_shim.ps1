@@ -31,6 +31,11 @@ if (-not (Test-Path $vcvars)) { throw "not found: $vcvars" }
 
 New-Item -ItemType Directory -Force -Path $build | Out-Null
 $dll = Join-Path $root "lib\raylib_ahk_shim.dll"
+# Link into build\ first. Writing straight over lib\raylib_ahk_shim.dll leaves a window
+# where the file is a partially written image, and a demo that loads it in that instant
+# reports "Failed to load downloaded DLL"; a script that is already running holds the file
+# open and makes the write fail outright.
+$staged = Join-Path $build "raylib_ahk_shim.dll"
 $implib = Join-Path $build "raylib_import.lib"
 
 # An import library built from the header's own export list. The release also ships
@@ -44,7 +49,7 @@ $bat = Join-Path $build "compile.bat"
     'lib /nologo /def:"' + (Join-Path $root "vendor\raylib.def") + '" /machine:x64' +
         ' /out:"' + $implib + '" || exit /b 1'
     'cl /nologo /MT /O2 /W3 /D_CRT_SECURE_NO_WARNINGS /LD "' + (Join-Path $root "vendor\shim.c") + '"' +
-        ' /Fe:"' + $dll + '" /link /Brepro /IMPLIB:"' + (Join-Path $build "raylib_ahk_shim.lib") + '"' +
+        ' /Fe:"' + $staged + '" /link /Brepro /IMPLIB:"' + (Join-Path $build "raylib_ahk_shim.lib") + '"' +
         ' "' + $implib + '" || exit /b 1'
 ) | Set-Content $bat -Encoding Ascii
 
@@ -57,6 +62,26 @@ try {
 }
 Remove-Item "$build\shim.obj", $bat -Force -ErrorAction SilentlyContinue
 if ($code -ne 0) { throw "the build failed with exit code $code" }
+
+# Publish it only if it changed, and retry a little if a running demo still has the old one
+# loaded. /Brepro makes the image byte-stable, so an unchanged shim is now a no-op here.
+if ((Test-Path $dll) -and
+        (Get-FileHash $staged -Algorithm SHA256).Hash -eq (Get-FileHash $dll -Algorithm SHA256).Hash) {
+    Write-Host 'lib\raylib_ahk_shim.dll unchanged, left in place'
+} else {
+    $copied = $false
+    for ($try = 1; $try -le 20 -and -not $copied; $try++) {
+        try { Copy-Item $staged $dll -Force; $copied = $true }
+        catch { Start-Sleep -Milliseconds 250 }
+    }
+    if (-not $copied) {
+        throw @"
+Could not replace lib\raylib_ahk_shim.dll: a running script still has it loaded.
+Close any demo window (or the script that opened it) and run this script again.
+The newly built copy is at build\raylib_ahk_shim.dll
+"@
+    }
+}
 
 # /Brepro leaves the timestamp out of the image, so rebuilding the same shim.c produces
 # the same bytes. The DLL is committed, and a build that rewrote it every time would

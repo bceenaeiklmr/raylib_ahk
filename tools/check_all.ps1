@@ -88,6 +88,7 @@ Step 'generate' { python tools\gen_wrapper.py | Select-Object -Last 3 }
 Step 'build shim' { & tools\build_shim.ps1 | Select-Object -Last 1 }
 Step 'struct model' { python tools\check_layout.py | Select-Object -Last 1 }
 Step 'api names' { python tools\check_names.py | Select-Object -Last 1 }
+Step 'arity' { python tools\check_calls.py | Select-Object -Last 2 }
 Step 'precheck' { python tools\precheck.py | Select-Object -Last 3 }
 Step 'validate lib' { Run-Ahk -Script 'lib\raylib.ahk' -Pre @('/Validate') | Out-Null }
 Step 'validate tests' { Run-Ahk -Script 'tests\smoke.ahk' -Pre @('/Validate') | Out-Null }

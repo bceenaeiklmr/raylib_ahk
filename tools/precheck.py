@@ -49,9 +49,13 @@ for path in tracked:
 
 # Links in the README must resolve, or GitHub renders a 404 the local reader never sees.
 readme = io.open("README.md", encoding="utf-8-sig").read()
-for link in re.findall(r"\]\(([^)#][^)]*)\)", readme):
-    if not link.startswith("http") and not os.path.exists(link.replace("\\", "/")):
-        problems.append("README links to a missing file: %s" % link)
+links = re.findall(r"\]\(([^)#][^)]*)\)", readme)        # [text](target)
+links += re.findall(r'<img[^>]*src="([^"]+)"', readme)   # <img src="...">
+for link in links:
+    if link.startswith("http"):
+        continue
+    if not os.path.exists(link.replace("\\", "/")):
+        problems.append("README references a missing file: %s" % link)
 
 # The README quotes the generator's counts; regeneration must not leave them stale.
 report = subprocess.run([sys.executable, "tools/gen_wrapper.py"], capture_output=True, text=True)

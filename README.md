@@ -1,4 +1,6 @@
-﻿# raylib.ahk
+﻿![raylib.ahk - raylib 5.5 bindings for AutoHotkey v2, with three demo windows](docs/banner.png)
+
+# raylib.ahk
 
 [raylib](https://www.raylib.com) 5.5 for AutoHotkey v2: windowed graphics, shapes, images,
 textures, custom fonts, 3D and audio, driven straight from a script.
@@ -8,14 +10,12 @@ track the library instead of drifting from it. Of raylib's 581 functions **497 a
 218 through plain `DllCall`, 279 through a small companion DLL, and 84 left out on purpose
 (with the reason written down in [tools/skipped.txt](tools/skipped.txt)).
 
-![Shapes, a textured 3D cube with accented text, a sprite sheet and a brick game, all drawn from AutoHotkey](docs/preview.png)
-
 ```ahk
 #Requires AutoHotkey v2.0
-#Include %A_ScriptDir%\..\lib\raylib.ahk
+#Include ..\lib\raylib.ahk        ; relative to this file, the way the demos do it
 
+RL.SetConfigFlags(RL.FLAG_VSYNC_HINT)   ; flags go on before the window exists
 RL.InitWindow(320, 200, "raylib.ahk")
-RL.SetTargetFPS(60)
 while !RL.WindowShouldClose() {
     RL.BeginDrawing()
     RL.ClearBackground(RL.RAYWHITE)
@@ -25,6 +25,18 @@ while !RL.WindowShouldClose() {
 }
 RL.CloseWindow()
 ```
+
+Save it as `examples\hello.ahk` - anywhere one folder below the repo root - and run it:
+
+```
+"C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" examples\hello.ahk
+```
+
+`#Include %A_ScriptDir%\..\lib\raylib.ahk` works too, but only from a file. Piped into the
+interpreter (an editor running an unsaved buffer, or `AutoHotkey64.exe *`), `A_ScriptDir` is
+empty and the include collapses to `Missing "#Include" directive argument`.
+
+VSYNC rather than `SetTargetFPS(60)`, for the reason in [Gotchas](#gotchas).
 
 ## Run it
 
@@ -40,7 +52,17 @@ cd raylib_ahk
 `lib/raylib.ahk` loads `raylib.dll` and `raylib_ahk_shim.dll` from its own folder at include
 time, so any script that `#Include`s it works from any working directory.
 
+## What it looks like
+
+Seven demos, one screenshot each, every one of them captured by the demo itself.
+
+![A grid of 2D primitives, a textured cube with accented text, procedural textures and a sprite sheet, typography at four sizes, an input panel, a brick game, and a trail of bouncing circles](docs/gallery.png)
+
+<img src="docs/rule.png" width="100%" alt="">
+
 ## How the binding works
+
+![How a call gets from a script to the GPU](docs/pipeline.png)
 
 `DllCall` can pass and return machine words: integers, floats, pointers, and — on x64 — a
 struct of four bytes such as `Color`. Anything bigger cannot cross that boundary: Windows
@@ -217,6 +239,8 @@ powershell -ExecutionPolicy Bypass -File tools\check_all.ps1    # everything, en
 Building the shim needs a C compiler and the raylib **DLL**, never `raylib.lib` — linking the
 static library would embed a second copy of raylib with its own window and GL context.
 
+<img src="docs/rule.png" width="100%" alt="">
+
 ## Gotchas
 
 - The interpreter's own switches go **before** the script, the script's own arguments
@@ -278,6 +302,19 @@ static library would embed a second copy of raylib with its own window and GL co
   `RL.Codepoints("őű")` and its length to bake exactly the characters you need.
   `tests/smoke.ahk` compares the two: the built-in font draws `ő` as nothing, the TTF draws it.
 
+- **`/ErrorStdOut` only redirects load errors.** A *runtime* error still raises the modal
+  dialog - so a headless run of a script that calls, say, `RL.InitWindow` with four
+  arguments waits for someone to click OK and reports exit code 0. `examples\harness.ahk`
+  installs `OnError()` to print the error and `ExitApp(1)`; a bare snippet has no such
+  handler, which is why `tools\check_calls.py` checks argument counts statically instead of
+  by launching anything.
+- **A rebuild must not race a running script.** Regenerating rewrites `lib\raylib.ahk` (the
+  file every demo `#Include`s) and linking rewrites `lib\raylib_ahk_shim.dll`. Both tools
+  now write to a temporary file and only replace the target when the bytes actually
+  changed, so re-running the generator over an unchanged header leaves readers alone;
+  before that, a launch that landed inside the write window got `Failed to read text file`,
+  `Missing "#Include" directive argument`, or a half-written DLL.
+
 ## Layout
 
 ```
@@ -293,16 +330,20 @@ tools/get_raylib.ps1        downloads a raylib release and refreshes vendor/ and
 tools/check_layout.py       compares the generator's struct model with the compiler's
 tools/run_ahk.ps1           runs a script headlessly with the 64-bit interpreter
 tools/check_names.py        reports RL.<name> uses that the wrapper does not define
+tools/check_calls.py        checks every RL.<name>() call's argument count, README included
 tools/check_all.ps1         the whole verification chain
 tools/skipped.txt           every unbound function, with its reason
 tools/precheck.py           encoding, dead-link and stale-number checks before publishing
 tools/fix_mojibake.py       repairs text double-encoded by Windows PowerShell 5.1
-tools/preview.ps1           builds docs/preview.png out of the demo screenshots
+tools/art.ps1               builds the README images out of the demo screenshots
+tools/check_file.ps1        answers whether a script file is readable and matches git
 tests/smoke.ahk             69 pixel-level checks
 examples/                   seven runnable demos plus harness.ahk
-docs/preview.png            the image at the top of this file
+docs/                       banner, gallery, pipeline and rule, built by tools/art.ps1
 legacy/                     the hand-written v0.1 wrapper, for reference
 ```
+
+<img src="docs/rule.png" width="100%" alt="">
 
 ## License
 
