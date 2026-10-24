@@ -309,3 +309,8 @@ legacy/                     the hand-written v0.1 wrapper, for reference
 The wrapper, the generator and the demos are MIT - see [LICENSE](LICENSE). raylib 5.5 itself is
 zlib licensed; its license text ships in [vendor/LICENSE](vendor/LICENSE), and `lib/raylib.dll`
 is that same library, unmodified, from the official release.
+
+Neither licence asks anything of what you build with them. Scripts, games and closed-source
+tools made with these bindings stay yours, under whatever licence you pick, with no
+obligation to open-source anything. The only duties fall on whoever redistributes raylib's
+own files: keep `vendor/LICENSE` alongside them and don't claim you wrote raylib.
