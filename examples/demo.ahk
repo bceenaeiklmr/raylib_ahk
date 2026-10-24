@@ -30,6 +30,11 @@ FloorY := Height - 46
 Gravity := 1500.0   ; pixels/s^2
 Bounce := 0.82      ; energy kept after a wall hit
 Drag := 0.35        ; per second
+MaxSpeed := 2600.0  ; px/s cap, keeps the cursor spring from diverging
+RestSpeed := 60.0   ; px/s below which the ball counts as parked
+Relaunch := 2200.0  ; ms parked before it gets pushed again
+PushVX := 420.0     ; relaunch impulse, px/s
+PushVY := 900.0
 Palette := [RL.MAROON, RL.SKYBLUE, RL.GOLD, RL.LIME, RL.PURPLE, RL.ORANGE]
 Pen := 1
 
@@ -37,6 +42,9 @@ RL.SetConfigFlags(RL.FLAG_WINDOW_RESIZABLE)
 RL.InitWindow(Width, Height, "raylib.ahk demo  -  WASD/arrows nudge, hold left mouse to fling, C color, R reset, Esc quits")
 RL.SetTargetFPS(60)
 Reset()
+StartTick := A_TickCount
+ParkedSince := A_TickCount
+Kicks := 0
 
 while !RL.WindowShouldClose() {
     Dt := RL.GetFrameTime()
@@ -65,6 +73,26 @@ while !RL.WindowShouldClose() {
     VY += Gravity * Dt
     VX *= 1.0 - Drag * Dt
     VY *= 1.0 - Drag * Dt
+
+    ; Cap the speed. Unbounded, the cursor spring feeds itself every frame until
+    ; the position runs away to Inf and the ball leaves the window for good.
+    Speed := Sqrt(VX * VX + VY * VY)
+    if (Speed > MaxSpeed) {
+        VX *= MaxSpeed / Speed
+        VY *= MaxSpeed / Speed
+    }
+
+    ; Never let it look dead: gravity and bouncing bleed the energy out, so after a
+    ; quiet moment at rest the ball gets pushed again, alternating direction.
+    if (Speed > RestSpeed)
+        ParkedSince := A_TickCount
+    else if (A_TickCount - ParkedSince > Relaunch) {
+        Kicks++
+        VX := Mod(Kicks, 2) ? PushVX : -PushVX
+        VY := -PushVY
+        ParkedSince := A_TickCount
+    }
+
     X += VX * Dt
     Y += VY * Dt
     if (Y + Radius > FloorY) {
@@ -87,13 +115,14 @@ while !RL.WindowShouldClose() {
 
     Trail.Push(X, Y)
     while (Trail.Length > 90) {  ; drop whole pairs so x,y stays aligned
-        Trail.Delete(1)
-        Trail.Delete(1)
+        ; RemoveAt shifts the array down. Delete only punches a hole, so Length
+        ; would never shrink and this loop would spin with the window frozen.
+        Trail.RemoveAt(1, 2)
     }
 
     RenderFrame(Dt)
 
-    if (AutoExit && A_TickCount >= AutoExit) {
+    if (AutoExit && A_TickCount - StartTick >= AutoExit) {
         if (ShotName != "") {
             ; raylib flushes its draw batch inside EndDrawing() and the readback
             ; is one buffer swap behind, so draw twice and shot after the second.

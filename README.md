@@ -117,6 +117,10 @@ through `RL.Raw()` with an explicit integer return type.
   above codepoint 126 come out as blanks until you load a font, and `LoadFontEx`
   returns a `Font` struct, which `DllCall` cannot receive. Use `DrawText` with
   ASCII, or add a shim DLL for custom fonts.
+- **`Array.Delete(1)` does not shrink `Length`.** It leaves a hole; only
+  `Array.RemoveAt(1, 2)` shifts the array down. A `while Length > n` trim loop
+  built on `Delete` spins forever and freezes the window at the frame the cap is
+  reached (this is what the first version of the demo did, at about one second).
 - **`TakeScreenshot()` writes into the process working directory.** It drops the
   directory part of the name it is given, so `SetWorkingDir()` first.
 - **A screenshot is one buffer swap behind.** raylib flushes its draw batch inside
@@ -135,7 +139,7 @@ through `RL.Raw()` with an explicit integer return type.
 & 'C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe' /ErrorStdOut tests\smoke.ahk 2>&1
 ```
 
-39 checks, exit code 0 on success. It opens an undecorated unfocused 320x240
+41 checks, exit code 0 on success. It opens an undecorated unfocused 320x240
 window, draws one shape of each kind, captures the frame with raylib itself and
 verifies the pixels, so the ABI assumptions the wrapper depends on are tested
 against real rendered output rather than against the header: color byte order

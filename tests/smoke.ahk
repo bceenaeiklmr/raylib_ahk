@@ -110,6 +110,17 @@ Check(RL.GetTime() > 0.0, "GetTime > 0")
 Check(RL.GetFrameTime() > 0.0, "GetFrameTime > 0")
 Check(RL.GetFPS() >= 0, "GetFPS >= 0")
 
+; The demo's trail trim depends on this: Delete only punches a hole, so Length
+; never shrinks and a `while Length > n` guard spins forever with the window
+; frozen. Only RemoveAt shifts the array down.
+Tr := []
+Loop 100
+    Tr.Push(A_Index, A_Index)
+Tr.Delete(1)
+Check(Tr.Length == 200, "Array.Delete leaves Length unchanged")
+Tr.RemoveAt(1, 2)
+Check(Tr.Length == 198, "Array.RemoveAt shifts and shrinks Length")
+
 RL.CloseWindow()
 
 FileAppend("checks: " Checks ", failures: " Fails "`n", "*")
