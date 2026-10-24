@@ -1,0 +1,22 @@
+# Line endings, so a clone on any machine gets the same bytes git stored.
+# AutoHotkey reads either, but the generated file and the C sources are written with
+# specific endings by tools/gen_wrapper.py, and a silent conversion there is a
+# whole-file diff on the next regeneration.
+* text=auto
+
+*.ahk text eol=crlf
+*.ps1 text eol=crlf
+
+*.py text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.def text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+
+# Never touch a binary: a converted DLL is a corrupt DLL.
+*.dll binary
+*.lib binary
+*.obj binary
+*.exp binary
+*.png binary

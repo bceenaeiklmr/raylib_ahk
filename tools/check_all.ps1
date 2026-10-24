@@ -21,6 +21,7 @@ Step 'generate' { python tools\gen_wrapper.py | Select-Object -Last 3 }
 Step 'build shim' { & tools\build_shim.ps1 | Select-Object -Last 1 }
 Step 'struct model' { python tools\check_layout.py | Select-Object -Last 1 }
 Step 'api names' { python tools\check_names.py | Select-Object -Last 1 }
+Step 'precheck' { python tools\precheck.py | Select-Object -Last 3 }
 Step 'validate lib' { & $ahk /Validate /ErrorStdOut lib\raylib.ahk 2>&1 }
 Step 'validate tests' { & $ahk /Validate /ErrorStdOut tests\smoke.ahk 2>&1 }
 foreach ($d in $Demos) {

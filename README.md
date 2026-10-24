@@ -8,6 +8,8 @@ track the library instead of drifting from it. Of raylib's 581 functions **497 a
 218 through plain `DllCall`, 279 through a small companion DLL, and 84 left out on purpose
 (with the reason written down in [tools/skipped.txt](tools/skipped.txt)).
 
+![Shapes, a textured 3D cube with accented text, a sprite sheet and a brick game, all drawn from AutoHotkey](docs/preview.png)
+
 ```ahk
 #Requires AutoHotkey v2.0
 #Include %A_ScriptDir%\..\lib\raylib.ahk
@@ -26,7 +28,7 @@ RL.CloseWindow()
 
 ## Run it
 
-You need **64-bit AutoHotkey v2** (`AutoHotkey64.exe`) â€” the shipped DLLs are x64. Nothing
+You need **64-bit AutoHotkey v2** (`AutoHotkey64.exe`) — the shipped DLLs are x64. Nothing
 else: no compiler, no raylib install, no runtime redist.
 
 ```
@@ -40,7 +42,7 @@ time, so any script that `#Include`s it works from any working directory.
 
 ## How the binding works
 
-`DllCall` can pass and return machine words: integers, floats, pointers, and â€” on x64 â€” a
+`DllCall` can pass and return machine words: integers, floats, pointers, and — on x64 — a
 struct of four bytes such as `Color`. Anything bigger cannot cross that boundary: Windows
 copies large structs into a hidden stack area, and `DllCall` has no way to describe what it
 is passing or receiving. That rules out `Texture2D`, `Image`, `Font`, `Camera3D`, `Sound`,
@@ -93,7 +95,7 @@ RL.UnloadTexture(tex)
 
 `lib/raylib_ahk_shim.dll` sits next to `raylib.dll` and is loaded with it. It is a thin
 forwarding layer against the *same* `raylib.dll`, so textures, fonts, meshes and audio
-streams stay in one raylib context â€” no second copy of the library, no second GL context.
+streams stay in one raylib context — no second copy of the library, no second GL context.
 
 **3. Struct accessors as generated methods.** Every field of every struct is read and
 written through a generated pair of methods, nested fields included, so no script hardcodes
@@ -123,9 +125,9 @@ cross `DllCall`.
 | `Vector2/3/4`, `Rectangle` | numbers in, array out: `[x, y]`, `[x, y, z]`, `[x, y, w, h]` |
 | any other struct | a `Buffer` returned by the loader, passed back to every method that takes it |
 | struct fields | `RL.<Struct>_<Field>(buf)` / `RL.<Struct>_<Field>(buf, value)`; nested paths included (`RL.Camera3D_PositionX`), pointer fields give back an address |
-| `const char *` | AutoHotkey strings, converted to UTF-8 by `RL.U8()` â€” so accents and CJK work |
+| `const char *` | AutoHotkey strings, converted to UTF-8 by `RL.U8()` — so accents and CJK work |
 | `const Vector2 *points, int count` | one flat array: `RL.DrawPoly([x1, y1, x2, y2, x3, y3], 3, color)` |
-| `const int *codepoints, int count` | `RL.Codepoints("Å‘Å±")` builds the buffer, `cps.Size // 4` is the count |
+| `const int *codepoints, int count` | `RL.Codepoints("őű")` builds the buffer, `cps.Size // 4` is the count |
 | `bool` | `Char` in the call, truthy in the script |
 | a screenshot | `RL.ScreenShot("C:\full\path.png")`; `TakeScreenshot()` takes a bare name only |
 | `Camera3D` / `Camera2D` | `RL.MakeCamera3D(pos, target, up, fovy, proj)` / `RL.MakeCamera2D(offset, target, rotation, zoom)` |
@@ -151,7 +153,7 @@ it.
 | colour & math | 13 | `Fade`, `ColorTint`, `Clamp`, `Lerp`, `Normalize`, `Vector*` helpers |
 
 Left out: raw memory and file-byte helpers (`MemAlloc`, `LoadFileData`, `LoadUTF8`, the
-`Text*` helpers â€” AutoHotkey has `Buffer`, `FileRead` and `StrLen`), exporters that return
+`Text*` helpers — AutoHotkey has `Buffer`, `FileRead` and `StrLen`), exporters that return
 source code, callbacks, VR stereo, `FilePathList`, and font baking. Each reason is listed per
 function in `tools/skipped.txt`.
 
@@ -212,14 +214,14 @@ powershell -ExecutionPolicy Bypass -File tools\check_all.ps1    # everything, en
 ```
 
 `tools/gen_wrapper.py` reads `vendor/raylib.h` only: no libclang, no compiler, no internet.
-Building the shim needs a C compiler and the raylib **DLL**, never `raylib.lib` â€” linking the
+Building the shim needs a C compiler and the raylib **DLL**, never `raylib.lib` — linking the
 static library would embed a second copy of raylib with its own window and GL context.
 
 ## Gotchas found the hard way
 
 - **`Array.Delete(pos)` does not shorten an array.** It marks the slot and leaves `Length`
   alone, so a `while arr.Length > n` trim loop after `Delete(1)` spins forever and the window
-  stops responding at the frame where trimming starts. Use `Array.RemoveAt(1, count)` â€” it
+  stops responding at the frame where trimming starts. Use `Array.RemoveAt(1, count)` — it
   shifts and shrinks. `tests/smoke.ahk` asserts this behaviour so the trap cannot come back
   silently.
 - **`A_TickCount` is system uptime**, not time since the script started. Measure a run with
@@ -263,8 +265,8 @@ static library would embed a second copy of raylib with its own window and GL co
 - **The default raylib font covers 224 glyphs.** Anything outside it, including most of
   Central European Latin, renders as blanks: pass a TTF to `RL.LoadFontEx`. With `0, 0` for
   the last two parameters it loads the same 224-glyph set from that TTF; pass
-  `RL.Codepoints("Å‘Å±")` and its length to bake exactly the characters you need.
-  `tests/smoke.ahk` compares the two: the built-in font draws `Å‘` as nothing, the TTF draws it.
+  `RL.Codepoints("őű")` and its length to bake exactly the characters you need.
+  `tests/smoke.ahk` compares the two: the built-in font draws `ő` as nothing, the TTF draws it.
 
 ## Layout
 
@@ -283,11 +285,17 @@ tools/run_ahk.ps1           runs a script headlessly with the 64-bit interpreter
 tools/check_names.py        reports RL.<name> uses that the wrapper does not define
 tools/check_all.ps1         the whole verification chain
 tools/skipped.txt           every unbound function, with its reason
+tools/precheck.py           encoding, dead-link and stale-number checks before publishing
+tools/fix_mojibake.py       repairs text double-encoded by Windows PowerShell 5.1
+tools/preview.ps1           builds docs/preview.png out of the demo screenshots
 tests/smoke.ahk             69 pixel-level checks
 examples/                   seven runnable demos plus harness.ahk
+docs/preview.png            the image at the top of this file
 legacy/                     the hand-written v0.1 wrapper, for reference
 ```
 
 ## License
 
-raylib is zlib-licensed; see [vendor/LICENSE](vendor/LICENSE). This wrapper is zlib too.
+The wrapper, the generator and the demos are MIT - see [LICENSE](LICENSE). raylib 5.5 itself is
+zlib licensed; its license text ships in [vendor/LICENSE](vendor/LICENSE), and `lib/raylib.dll`
+is that same library, unmodified, from the official release.
