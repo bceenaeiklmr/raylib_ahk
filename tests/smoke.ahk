@@ -182,6 +182,15 @@ if (Shot2 == 0) {
     RL.UnloadTexture(Shot2)
 }
 
+; The same accessor method writes when it is given a second argument. Zero has to
+; work, so an empty string, not a false test, is what means "read only".
+Fld := Buffer(RL.Texture_Size, 0)
+RL.Texture_Id(Fld, 4242)
+RL.Texture_Width(Fld, 64)
+RL.Texture_Height(Fld, 0)
+Check(RL.Texture_Id(Fld) == 4242 && RL.Texture_Width(Fld) == 64 && RL.Texture_Height(Fld) == 0,
+    "accessors write as well as read, zero included")
+
 ; ---------------------------------------------------------------- 3D and audio
 ; Both need structs that DllCall cannot pass: Camera3D is 44 bytes and Wave 24.
 Cam := RL.MakeCamera3D([0, 2, 5], [0, 0.5, 0], [0, 1, 0], 45, RL.CAMERA_PERSPECTIVE)
@@ -215,6 +224,12 @@ if (Wave == 0) {
     Check(RL.Wave_Data(Wave) != 0 && RL.Wave_SampleRate(Wave) == 44100
         && RL.Wave_Channels(Wave) == 1 && RL.Wave_SampleSize(Wave) == 16,
         "the Wave accessors agree with the file")
+    ; The same bytes from memory. raudio wants the type with its leading dot: pass
+    ; "wav" and it answers "Data format not supported".
+    Bytes := FileRead(WavPath, "RAW")
+    Mem := RL.LoadWaveFromMemory(".wav", Bytes, Bytes.Size)
+    Check(RL.Wave_FrameCount(Mem) == Frames, "LoadWaveFromMemory decodes the same bytes")
+    RL.UnloadWave(Mem)
     RL.InitAudioDevice()
     if RL.IsAudioDeviceReady() {
         Snd := RL.LoadSoundFromWave(Wave)

@@ -1,6 +1,7 @@
 <#
-    Run a headless verification chain: regenerate, rebuild the shim, check the struct
-    model, validate every script, and run the tests.
+    Run the whole verification chain: regenerate, rebuild the shim, check the struct
+    model and the API names, validate every script, and run the tests and every demo
+    headlessly with a screenshot.
 
       powershell -ExecutionPolicy Bypass -File tools\check_all.ps1
 #>
@@ -8,6 +9,7 @@ $ErrorActionPreference = 'Continue'
 Set-Location (Split-Path $PSScriptRoot -Parent)
 $ahk = 'C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe'
 $fail = 0
+$Demos = 'demo', 'shapes', 'textures', 'fonts', 'input', 'paddle', 'cube'
 
 function Step([string]$name, [scriptblock]$body) {
     Write-Host "`n=== $name"
@@ -18,13 +20,18 @@ function Step([string]$name, [scriptblock]$body) {
 Step 'generate' { python tools\gen_wrapper.py | Select-Object -Last 3 }
 Step 'build shim' { & tools\build_shim.ps1 | Select-Object -Last 1 }
 Step 'struct model' { python tools\check_layout.py | Select-Object -Last 1 }
+Step 'api names' { python tools\check_names.py | Select-Object -Last 1 }
 Step 'validate lib' { & $ahk /Validate /ErrorStdOut lib\raylib.ahk 2>&1 }
 Step 'validate tests' { & $ahk /Validate /ErrorStdOut tests\smoke.ahk 2>&1 }
-Step 'validate demo' { & $ahk /Validate /ErrorStdOut examples\demo.ahk 2>&1 }`nStep 'validate cube' { & $ahk /Validate /ErrorStdOut examples\cube.ahk 2>&1 }
+foreach ($d in $Demos) {
+    Step "validate $d" { & $ahk /Validate /ErrorStdOut "examples\$d.ahk" 2>&1 }
+}
 Step 'smoke test' { & $ahk /ErrorStdOut tests\smoke.ahk 2>&1 }
-Step 'demo' { & $ahk /ErrorStdOut '/auto:7000' examples\demo.ahk 2>&1 }
-Step 'cube' { & $ahk /ErrorStdOut '/auto:2500' '/shot:cube' examples\cube.ahk 2>&1 }
+foreach ($d in $Demos) {
+    Step "run $d" { & $ahk /ErrorStdOut '/auto:2500' "/shot:$d" "examples\$d.ahk" 2>&1 }
+}
 
-if ($fail) { Write-Host "`n$fail step(s) failed"; exit 1 }
-Write-Host "`nall steps passed"
+Write-Host "`nshots: $((Get-ChildItem tests\out\*.png).Count) files in tests\out"
+if ($fail) { Write-Host "$fail step(s) failed" -ForegroundColor Red; exit 1 }
+Write-Host 'all steps passed'
 exit 0

@@ -9,7 +9,8 @@
 ; returns one gives back an array: pos := RL.GetMousePosition().
 ; Fields of a nested struct carry their path in the accessor name, so the camera
 ; position is RL.Camera3D_PositionX(cam) and a render texture's color buffer is
-; RL.RenderTexture2D_TextureId(rt). A field that is a pointer in C gives back the
+; RL.RenderTexture2D_TextureId(rt). Pass a second argument to write the field:
+; RL.Texture_Width(tex, 320). A field that is a pointer in C gives back the
 ; address, which any method taking that struct accepts: RL.SetMaterialTexture(
 ; RL.Model_Materials(model), RL.MATERIAL_MAP_DIFFUSE, tex).
 ; Every struct that DllCall could not pass goes through raylib_ahk_shim.dll, which
@@ -2625,726 +2626,1172 @@ class RL {
     ; include time, so a layout change fails loudly instead of drawing garbage.
     ; AudioStream (32 bytes)
     static AudioStream_Size := 32
-    static AudioStream_Buffer(rlBuf) {
+    static AudioStream_Buffer(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Ptr")
     }
-    static AudioStream_Processor(rlBuf) {
+    static AudioStream_Processor(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Ptr")
     }
-    static AudioStream_SampleRate(rlBuf) {
+    static AudioStream_SampleRate(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "UInt")
     }
-    static AudioStream_SampleSize(rlBuf) {
+    static AudioStream_SampleSize(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "UInt")
     }
-    static AudioStream_Channels(rlBuf) {
+    static AudioStream_Channels(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "UInt")
     }
     ; BoundingBox (24 bytes)
     static BoundingBox_Size := 24
-    static BoundingBox_MinX(rlBuf) {
+    static BoundingBox_MinX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static BoundingBox_MinY(rlBuf) {
+    static BoundingBox_MinY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static BoundingBox_MinZ(rlBuf) {
+    static BoundingBox_MinZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static BoundingBox_MaxX(rlBuf) {
+    static BoundingBox_MaxX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
-    static BoundingBox_MaxY(rlBuf) {
+    static BoundingBox_MaxY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Float")
     }
-    static BoundingBox_MaxZ(rlBuf) {
+    static BoundingBox_MaxZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Float")
     }
     ; Camera2D (24 bytes)
     static Camera2D_Size := 24
-    static Camera2D_OffsetX(rlBuf) {
+    static Camera2D_OffsetX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static Camera2D_OffsetY(rlBuf) {
+    static Camera2D_OffsetY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static Camera2D_TargetX(rlBuf) {
+    static Camera2D_TargetX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static Camera2D_TargetY(rlBuf) {
+    static Camera2D_TargetY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
-    static Camera2D_Rotation(rlBuf) {
+    static Camera2D_Rotation(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Float")
     }
-    static Camera2D_Zoom(rlBuf) {
+    static Camera2D_Zoom(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Float")
     }
     ; Camera3D (44 bytes), also called Camera
     static Camera_Size := 44
-    static Camera_PositionX(rlBuf) {
+    static Camera_PositionX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static Camera_PositionY(rlBuf) {
+    static Camera_PositionY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static Camera_PositionZ(rlBuf) {
+    static Camera_PositionZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static Camera_TargetX(rlBuf) {
+    static Camera_TargetX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
-    static Camera_TargetY(rlBuf) {
+    static Camera_TargetY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Float")
     }
-    static Camera_TargetZ(rlBuf) {
+    static Camera_TargetZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Float")
     }
-    static Camera_UpX(rlBuf) {
+    static Camera_UpX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "Float")
     }
-    static Camera_UpY(rlBuf) {
+    static Camera_UpY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 28)
         return NumGet(rlBuf, 28, "Float")
     }
-    static Camera_UpZ(rlBuf) {
+    static Camera_UpZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "Float")
     }
-    static Camera_Fovy(rlBuf) {
+    static Camera_Fovy(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 36)
         return NumGet(rlBuf, 36, "Float")
     }
-    static Camera_Projection(rlBuf) {
+    static Camera_Projection(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 40)
         return NumGet(rlBuf, 40, "Int")
     }
     static Camera3D_Size := 44
-    static Camera3D_PositionX(rlBuf) {
+    static Camera3D_PositionX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static Camera3D_PositionY(rlBuf) {
+    static Camera3D_PositionY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static Camera3D_PositionZ(rlBuf) {
+    static Camera3D_PositionZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static Camera3D_TargetX(rlBuf) {
+    static Camera3D_TargetX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
-    static Camera3D_TargetY(rlBuf) {
+    static Camera3D_TargetY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Float")
     }
-    static Camera3D_TargetZ(rlBuf) {
+    static Camera3D_TargetZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Float")
     }
-    static Camera3D_UpX(rlBuf) {
+    static Camera3D_UpX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "Float")
     }
-    static Camera3D_UpY(rlBuf) {
+    static Camera3D_UpY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 28)
         return NumGet(rlBuf, 28, "Float")
     }
-    static Camera3D_UpZ(rlBuf) {
+    static Camera3D_UpZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "Float")
     }
-    static Camera3D_Fovy(rlBuf) {
+    static Camera3D_Fovy(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 36)
         return NumGet(rlBuf, 36, "Float")
     }
-    static Camera3D_Projection(rlBuf) {
+    static Camera3D_Projection(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 40)
         return NumGet(rlBuf, 40, "Int")
     }
     ; Font (48 bytes)
     static Font_Size := 48
-    static Font_BaseSize(rlBuf) {
+    static Font_BaseSize(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Int")
     }
-    static Font_GlyphCount(rlBuf) {
+    static Font_GlyphCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Int")
     }
-    static Font_GlyphPadding(rlBuf) {
+    static Font_GlyphPadding(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Int")
     }
-    static Font_Recs(rlBuf) {
+    static Font_Recs(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "Ptr")
     }
-    static Font_Glyphs(rlBuf) {
+    static Font_Glyphs(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 40)
         return NumGet(rlBuf, 40, "Ptr")
     }
     ; GlyphInfo (40 bytes)
     static GlyphInfo_Size := 40
-    static GlyphInfo_Value(rlBuf) {
+    static GlyphInfo_Value(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Int")
     }
-    static GlyphInfo_OffsetX(rlBuf) {
+    static GlyphInfo_OffsetX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Int")
     }
-    static GlyphInfo_OffsetY(rlBuf) {
+    static GlyphInfo_OffsetY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Int")
     }
-    static GlyphInfo_AdvanceX(rlBuf) {
+    static GlyphInfo_AdvanceX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Int")
     }
-    static GlyphInfo_ImageData(rlBuf) {
+    static GlyphInfo_ImageData(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Ptr")
     }
-    static GlyphInfo_ImageWidth(rlBuf) {
+    static GlyphInfo_ImageWidth(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "Int")
     }
-    static GlyphInfo_ImageHeight(rlBuf) {
+    static GlyphInfo_ImageHeight(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 28)
         return NumGet(rlBuf, 28, "Int")
     }
-    static GlyphInfo_ImageMipmaps(rlBuf) {
+    static GlyphInfo_ImageMipmaps(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "Int")
     }
-    static GlyphInfo_ImageFormat(rlBuf) {
+    static GlyphInfo_ImageFormat(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 36)
         return NumGet(rlBuf, 36, "Int")
     }
     ; Image (24 bytes)
     static Image_Size := 24
-    static Image_Data(rlBuf) {
+    static Image_Data(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Ptr")
     }
-    static Image_Width(rlBuf) {
+    static Image_Width(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Int")
     }
-    static Image_Height(rlBuf) {
+    static Image_Height(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Int")
     }
-    static Image_Mipmaps(rlBuf) {
+    static Image_Mipmaps(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Int")
     }
-    static Image_Format(rlBuf) {
+    static Image_Format(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Int")
     }
     ; Material (40 bytes)
     static Material_Size := 40
-    static Material_ShaderId(rlBuf) {
+    static Material_ShaderId(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "UInt")
     }
-    static Material_ShaderLocs(rlBuf) {
+    static Material_ShaderLocs(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Ptr")
     }
-    static Material_Maps(rlBuf) {
+    static Material_Maps(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Ptr")
     }
-    static Material_Params(rlBuf) {
+    static Material_Params(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "Float")
     }
     ; Matrix (64 bytes)
     static Matrix_Size := 64
-    static Matrix_M0(rlBuf) {
+    static Matrix_M0(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static Matrix_M4(rlBuf) {
+    static Matrix_M4(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static Matrix_M8(rlBuf) {
+    static Matrix_M8(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static Matrix_M12(rlBuf) {
+    static Matrix_M12(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
-    static Matrix_M1(rlBuf) {
+    static Matrix_M1(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Float")
     }
-    static Matrix_M5(rlBuf) {
+    static Matrix_M5(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Float")
     }
-    static Matrix_M9(rlBuf) {
+    static Matrix_M9(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "Float")
     }
-    static Matrix_M13(rlBuf) {
+    static Matrix_M13(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 28)
         return NumGet(rlBuf, 28, "Float")
     }
-    static Matrix_M2(rlBuf) {
+    static Matrix_M2(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "Float")
     }
-    static Matrix_M6(rlBuf) {
+    static Matrix_M6(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 36)
         return NumGet(rlBuf, 36, "Float")
     }
-    static Matrix_M10(rlBuf) {
+    static Matrix_M10(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 40)
         return NumGet(rlBuf, 40, "Float")
     }
-    static Matrix_M14(rlBuf) {
+    static Matrix_M14(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 44)
         return NumGet(rlBuf, 44, "Float")
     }
-    static Matrix_M3(rlBuf) {
+    static Matrix_M3(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 48)
         return NumGet(rlBuf, 48, "Float")
     }
-    static Matrix_M7(rlBuf) {
+    static Matrix_M7(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 52)
         return NumGet(rlBuf, 52, "Float")
     }
-    static Matrix_M11(rlBuf) {
+    static Matrix_M11(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 56)
         return NumGet(rlBuf, 56, "Float")
     }
-    static Matrix_M15(rlBuf) {
+    static Matrix_M15(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 60)
         return NumGet(rlBuf, 60, "Float")
     }
     ; Mesh (120 bytes)
     static Mesh_Size := 120
-    static Mesh_VertexCount(rlBuf) {
+    static Mesh_VertexCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Int")
     }
-    static Mesh_TriangleCount(rlBuf) {
+    static Mesh_TriangleCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Int")
     }
-    static Mesh_Vertices(rlBuf) {
+    static Mesh_Vertices(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Ptr")
     }
-    static Mesh_Texcoords(rlBuf) {
+    static Mesh_Texcoords(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Ptr")
     }
-    static Mesh_Texcoords2(rlBuf) {
+    static Mesh_Texcoords2(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "Ptr")
     }
-    static Mesh_Normals(rlBuf) {
+    static Mesh_Normals(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "Ptr")
     }
-    static Mesh_Tangents(rlBuf) {
+    static Mesh_Tangents(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 40)
         return NumGet(rlBuf, 40, "Ptr")
     }
-    static Mesh_Colors(rlBuf) {
+    static Mesh_Colors(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 48)
         return NumGet(rlBuf, 48, "Ptr")
     }
-    static Mesh_Indices(rlBuf) {
+    static Mesh_Indices(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 56)
         return NumGet(rlBuf, 56, "Ptr")
     }
-    static Mesh_AnimVertices(rlBuf) {
+    static Mesh_AnimVertices(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 64)
         return NumGet(rlBuf, 64, "Ptr")
     }
-    static Mesh_AnimNormals(rlBuf) {
+    static Mesh_AnimNormals(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 72)
         return NumGet(rlBuf, 72, "Ptr")
     }
-    static Mesh_BoneIds(rlBuf) {
+    static Mesh_BoneIds(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 80)
         return NumGet(rlBuf, 80, "Ptr")
     }
-    static Mesh_BoneWeights(rlBuf) {
+    static Mesh_BoneWeights(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 88)
         return NumGet(rlBuf, 88, "Ptr")
     }
-    static Mesh_BoneMatrices(rlBuf) {
+    static Mesh_BoneMatrices(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 96)
         return NumGet(rlBuf, 96, "Ptr")
     }
-    static Mesh_BoneCount(rlBuf) {
+    static Mesh_BoneCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 104)
         return NumGet(rlBuf, 104, "Int")
     }
-    static Mesh_VaoId(rlBuf) {
+    static Mesh_VaoId(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 108)
         return NumGet(rlBuf, 108, "UInt")
     }
-    static Mesh_VboId(rlBuf) {
+    static Mesh_VboId(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 112)
         return NumGet(rlBuf, 112, "Ptr")
     }
     ; Model (120 bytes)
     static Model_Size := 120
-    static Model_TransformM0(rlBuf) {
+    static Model_TransformM0(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static Model_TransformM4(rlBuf) {
+    static Model_TransformM4(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static Model_TransformM8(rlBuf) {
+    static Model_TransformM8(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static Model_TransformM12(rlBuf) {
+    static Model_TransformM12(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
-    static Model_TransformM1(rlBuf) {
+    static Model_TransformM1(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Float")
     }
-    static Model_TransformM5(rlBuf) {
+    static Model_TransformM5(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Float")
     }
-    static Model_TransformM9(rlBuf) {
+    static Model_TransformM9(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "Float")
     }
-    static Model_TransformM13(rlBuf) {
+    static Model_TransformM13(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 28)
         return NumGet(rlBuf, 28, "Float")
     }
-    static Model_TransformM2(rlBuf) {
+    static Model_TransformM2(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "Float")
     }
-    static Model_TransformM6(rlBuf) {
+    static Model_TransformM6(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 36)
         return NumGet(rlBuf, 36, "Float")
     }
-    static Model_TransformM10(rlBuf) {
+    static Model_TransformM10(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 40)
         return NumGet(rlBuf, 40, "Float")
     }
-    static Model_TransformM14(rlBuf) {
+    static Model_TransformM14(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 44)
         return NumGet(rlBuf, 44, "Float")
     }
-    static Model_TransformM3(rlBuf) {
+    static Model_TransformM3(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 48)
         return NumGet(rlBuf, 48, "Float")
     }
-    static Model_TransformM7(rlBuf) {
+    static Model_TransformM7(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 52)
         return NumGet(rlBuf, 52, "Float")
     }
-    static Model_TransformM11(rlBuf) {
+    static Model_TransformM11(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 56)
         return NumGet(rlBuf, 56, "Float")
     }
-    static Model_TransformM15(rlBuf) {
+    static Model_TransformM15(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 60)
         return NumGet(rlBuf, 60, "Float")
     }
-    static Model_MeshCount(rlBuf) {
+    static Model_MeshCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 64)
         return NumGet(rlBuf, 64, "Int")
     }
-    static Model_MaterialCount(rlBuf) {
+    static Model_MaterialCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 68)
         return NumGet(rlBuf, 68, "Int")
     }
-    static Model_Meshes(rlBuf) {
+    static Model_Meshes(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 72)
         return NumGet(rlBuf, 72, "Ptr")
     }
-    static Model_Materials(rlBuf) {
+    static Model_Materials(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 80)
         return NumGet(rlBuf, 80, "Ptr")
     }
-    static Model_MeshMaterial(rlBuf) {
+    static Model_MeshMaterial(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 88)
         return NumGet(rlBuf, 88, "Ptr")
     }
-    static Model_BoneCount(rlBuf) {
+    static Model_BoneCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 96)
         return NumGet(rlBuf, 96, "Int")
     }
-    static Model_Bones(rlBuf) {
+    static Model_Bones(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 104)
         return NumGet(rlBuf, 104, "Ptr")
     }
-    static Model_BindPose(rlBuf) {
+    static Model_BindPose(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 112)
         return NumGet(rlBuf, 112, "Ptr")
     }
     ; ModelAnimation (56 bytes)
     static ModelAnimation_Size := 56
-    static ModelAnimation_BoneCount(rlBuf) {
+    static ModelAnimation_BoneCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Int")
     }
-    static ModelAnimation_FrameCount(rlBuf) {
+    static ModelAnimation_FrameCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Int")
     }
-    static ModelAnimation_Bones(rlBuf) {
+    static ModelAnimation_Bones(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Ptr")
     }
-    static ModelAnimation_FramePoses(rlBuf) {
+    static ModelAnimation_FramePoses(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Ptr")
     }
-    static ModelAnimation_Name(rlBuf) {
+    static ModelAnimation_Name(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Char", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "Char")
     }
     ; Music (56 bytes)
     static Music_Size := 56
-    static Music_StreamBuffer(rlBuf) {
+    static Music_StreamBuffer(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Ptr")
     }
-    static Music_StreamProcessor(rlBuf) {
+    static Music_StreamProcessor(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Ptr")
     }
-    static Music_StreamSampleRate(rlBuf) {
+    static Music_StreamSampleRate(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "UInt")
     }
-    static Music_StreamSampleSize(rlBuf) {
+    static Music_StreamSampleSize(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "UInt")
     }
-    static Music_StreamChannels(rlBuf) {
+    static Music_StreamChannels(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "UInt")
     }
-    static Music_FrameCount(rlBuf) {
+    static Music_FrameCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "UInt")
     }
-    static Music_Looping(rlBuf) {
+    static Music_Looping(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Char", rlValue, rlBuf, 36)
         return NumGet(rlBuf, 36, "Char")
     }
-    static Music_CtxType(rlBuf) {
+    static Music_CtxType(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 40)
         return NumGet(rlBuf, 40, "Int")
     }
-    static Music_CtxData(rlBuf) {
+    static Music_CtxData(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 48)
         return NumGet(rlBuf, 48, "Ptr")
     }
     ; NPatchInfo (36 bytes)
     static NPatchInfo_Size := 36
-    static NPatchInfo_SourceX(rlBuf) {
+    static NPatchInfo_SourceX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static NPatchInfo_SourceY(rlBuf) {
+    static NPatchInfo_SourceY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static NPatchInfo_SourceWidth(rlBuf) {
+    static NPatchInfo_SourceWidth(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static NPatchInfo_SourceHeight(rlBuf) {
+    static NPatchInfo_SourceHeight(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
-    static NPatchInfo_Left(rlBuf) {
+    static NPatchInfo_Left(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Int")
     }
-    static NPatchInfo_Top(rlBuf) {
+    static NPatchInfo_Top(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Int")
     }
-    static NPatchInfo_Right(rlBuf) {
+    static NPatchInfo_Right(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "Int")
     }
-    static NPatchInfo_Bottom(rlBuf) {
+    static NPatchInfo_Bottom(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 28)
         return NumGet(rlBuf, 28, "Int")
     }
-    static NPatchInfo_Layout(rlBuf) {
+    static NPatchInfo_Layout(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "Int")
     }
     ; Ray (24 bytes)
     static Ray_Size := 24
-    static Ray_PositionX(rlBuf) {
+    static Ray_PositionX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static Ray_PositionY(rlBuf) {
+    static Ray_PositionY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static Ray_PositionZ(rlBuf) {
+    static Ray_PositionZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static Ray_DirectionX(rlBuf) {
+    static Ray_DirectionX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
-    static Ray_DirectionY(rlBuf) {
+    static Ray_DirectionY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Float")
     }
-    static Ray_DirectionZ(rlBuf) {
+    static Ray_DirectionZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Float")
     }
     ; RayCollision (32 bytes)
     static RayCollision_Size := 32
-    static RayCollision_Hit(rlBuf) {
+    static RayCollision_Hit(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Char", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Char")
     }
-    static RayCollision_Distance(rlBuf) {
+    static RayCollision_Distance(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static RayCollision_PointX(rlBuf) {
+    static RayCollision_PointX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static RayCollision_PointY(rlBuf) {
+    static RayCollision_PointY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
-    static RayCollision_PointZ(rlBuf) {
+    static RayCollision_PointZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Float")
     }
-    static RayCollision_NormalX(rlBuf) {
+    static RayCollision_NormalX(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Float")
     }
-    static RayCollision_NormalY(rlBuf) {
+    static RayCollision_NormalY(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "Float")
     }
-    static RayCollision_NormalZ(rlBuf) {
+    static RayCollision_NormalZ(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 28)
         return NumGet(rlBuf, 28, "Float")
     }
     ; Rectangle (16 bytes)
     static Rectangle_Size := 16
-    static Rectangle_X(rlBuf) {
+    static Rectangle_X(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static Rectangle_Y(rlBuf) {
+    static Rectangle_Y(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static Rectangle_Width(rlBuf) {
+    static Rectangle_Width(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static Rectangle_Height(rlBuf) {
+    static Rectangle_Height(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
     ; RenderTexture (44 bytes), also called RenderTexture2D
     static RenderTexture_Size := 44
-    static RenderTexture_Id(rlBuf) {
+    static RenderTexture_Id(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "UInt")
     }
-    static RenderTexture_TextureId(rlBuf) {
+    static RenderTexture_TextureId(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "UInt")
     }
-    static RenderTexture_TextureWidth(rlBuf) {
+    static RenderTexture_TextureWidth(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Int")
     }
-    static RenderTexture_TextureHeight(rlBuf) {
+    static RenderTexture_TextureHeight(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Int")
     }
-    static RenderTexture_TextureMipmaps(rlBuf) {
+    static RenderTexture_TextureMipmaps(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Int")
     }
-    static RenderTexture_TextureFormat(rlBuf) {
+    static RenderTexture_TextureFormat(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Int")
     }
-    static RenderTexture_DepthId(rlBuf) {
+    static RenderTexture_DepthId(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "UInt")
     }
-    static RenderTexture_DepthWidth(rlBuf) {
+    static RenderTexture_DepthWidth(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 28)
         return NumGet(rlBuf, 28, "Int")
     }
-    static RenderTexture_DepthHeight(rlBuf) {
+    static RenderTexture_DepthHeight(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "Int")
     }
-    static RenderTexture_DepthMipmaps(rlBuf) {
+    static RenderTexture_DepthMipmaps(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 36)
         return NumGet(rlBuf, 36, "Int")
     }
-    static RenderTexture_DepthFormat(rlBuf) {
+    static RenderTexture_DepthFormat(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 40)
         return NumGet(rlBuf, 40, "Int")
     }
     static RenderTexture2D_Size := 44
-    static RenderTexture2D_Id(rlBuf) {
+    static RenderTexture2D_Id(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "UInt")
     }
-    static RenderTexture2D_TextureId(rlBuf) {
+    static RenderTexture2D_TextureId(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "UInt")
     }
-    static RenderTexture2D_TextureWidth(rlBuf) {
+    static RenderTexture2D_TextureWidth(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Int")
     }
-    static RenderTexture2D_TextureHeight(rlBuf) {
+    static RenderTexture2D_TextureHeight(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Int")
     }
-    static RenderTexture2D_TextureMipmaps(rlBuf) {
+    static RenderTexture2D_TextureMipmaps(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Int")
     }
-    static RenderTexture2D_TextureFormat(rlBuf) {
+    static RenderTexture2D_TextureFormat(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "Int")
     }
-    static RenderTexture2D_DepthId(rlBuf) {
+    static RenderTexture2D_DepthId(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "UInt")
     }
-    static RenderTexture2D_DepthWidth(rlBuf) {
+    static RenderTexture2D_DepthWidth(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 28)
         return NumGet(rlBuf, 28, "Int")
     }
-    static RenderTexture2D_DepthHeight(rlBuf) {
+    static RenderTexture2D_DepthHeight(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "Int")
     }
-    static RenderTexture2D_DepthMipmaps(rlBuf) {
+    static RenderTexture2D_DepthMipmaps(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 36)
         return NumGet(rlBuf, 36, "Int")
     }
-    static RenderTexture2D_DepthFormat(rlBuf) {
+    static RenderTexture2D_DepthFormat(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 40)
         return NumGet(rlBuf, 40, "Int")
     }
     ; Shader (16 bytes)
     static Shader_Size := 16
-    static Shader_Id(rlBuf) {
+    static Shader_Id(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "UInt")
     }
-    static Shader_Locs(rlBuf) {
+    static Shader_Locs(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Ptr")
     }
     ; Sound (40 bytes)
     static Sound_Size := 40
-    static Sound_StreamBuffer(rlBuf) {
+    static Sound_StreamBuffer(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Ptr")
     }
-    static Sound_StreamProcessor(rlBuf) {
+    static Sound_StreamProcessor(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Ptr")
     }
-    static Sound_StreamSampleRate(rlBuf) {
+    static Sound_StreamSampleRate(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "UInt")
     }
-    static Sound_StreamSampleSize(rlBuf) {
+    static Sound_StreamSampleSize(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 20)
         return NumGet(rlBuf, 20, "UInt")
     }
-    static Sound_StreamChannels(rlBuf) {
+    static Sound_StreamChannels(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 24)
         return NumGet(rlBuf, 24, "UInt")
     }
-    static Sound_FrameCount(rlBuf) {
+    static Sound_FrameCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 32)
         return NumGet(rlBuf, 32, "UInt")
     }
     ; Texture (20 bytes), also called Texture2D, TextureCubemap
     static Texture_Size := 20
-    static Texture_Id(rlBuf) {
+    static Texture_Id(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "UInt")
     }
-    static Texture_Width(rlBuf) {
+    static Texture_Width(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Int")
     }
-    static Texture_Height(rlBuf) {
+    static Texture_Height(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Int")
     }
-    static Texture_Mipmaps(rlBuf) {
+    static Texture_Mipmaps(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Int")
     }
-    static Texture_Format(rlBuf) {
+    static Texture_Format(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Int")
     }
     static Texture2D_Size := 20
-    static Texture2D_Id(rlBuf) {
+    static Texture2D_Id(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "UInt")
     }
-    static Texture2D_Width(rlBuf) {
+    static Texture2D_Width(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Int")
     }
-    static Texture2D_Height(rlBuf) {
+    static Texture2D_Height(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Int")
     }
-    static Texture2D_Mipmaps(rlBuf) {
+    static Texture2D_Mipmaps(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Int")
     }
-    static Texture2D_Format(rlBuf) {
+    static Texture2D_Format(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Int")
     }
     static TextureCubemap_Size := 20
-    static TextureCubemap_Id(rlBuf) {
+    static TextureCubemap_Id(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "UInt")
     }
-    static TextureCubemap_Width(rlBuf) {
+    static TextureCubemap_Width(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Int")
     }
-    static TextureCubemap_Height(rlBuf) {
+    static TextureCubemap_Height(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Int")
     }
-    static TextureCubemap_Mipmaps(rlBuf) {
+    static TextureCubemap_Mipmaps(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Int")
     }
-    static TextureCubemap_Format(rlBuf) {
+    static TextureCubemap_Format(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Int", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Int")
     }
     ; Vector2 (8 bytes)
     static Vector2_Size := 8
-    static Vector2_X(rlBuf) {
+    static Vector2_X(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static Vector2_Y(rlBuf) {
+    static Vector2_Y(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
     ; Vector3 (12 bytes)
     static Vector3_Size := 12
-    static Vector3_X(rlBuf) {
+    static Vector3_X(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static Vector3_Y(rlBuf) {
+    static Vector3_Y(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static Vector3_Z(rlBuf) {
+    static Vector3_Z(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
     ; Vector4 (16 bytes), also called Quaternion
     static Quaternion_Size := 16
-    static Quaternion_X(rlBuf) {
+    static Quaternion_X(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static Quaternion_Y(rlBuf) {
+    static Quaternion_Y(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static Quaternion_Z(rlBuf) {
+    static Quaternion_Z(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static Quaternion_W(rlBuf) {
+    static Quaternion_W(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
     static Vector4_Size := 16
-    static Vector4_X(rlBuf) {
+    static Vector4_X(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "Float")
     }
-    static Vector4_Y(rlBuf) {
+    static Vector4_Y(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "Float")
     }
-    static Vector4_Z(rlBuf) {
+    static Vector4_Z(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "Float")
     }
-    static Vector4_W(rlBuf) {
+    static Vector4_W(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Float", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "Float")
     }
     ; Wave (24 bytes)
     static Wave_Size := 24
-    static Wave_FrameCount(rlBuf) {
+    static Wave_FrameCount(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 0)
         return NumGet(rlBuf, 0, "UInt")
     }
-    static Wave_SampleRate(rlBuf) {
+    static Wave_SampleRate(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 4)
         return NumGet(rlBuf, 4, "UInt")
     }
-    static Wave_SampleSize(rlBuf) {
+    static Wave_SampleSize(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 8)
         return NumGet(rlBuf, 8, "UInt")
     }
-    static Wave_Channels(rlBuf) {
+    static Wave_Channels(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("UInt", rlValue, rlBuf, 12)
         return NumGet(rlBuf, 12, "UInt")
     }
-    static Wave_Data(rlBuf) {
+    static Wave_Data(rlBuf, rlValue := "") {
+        if (rlValue != "")
+            NumPut("Ptr", rlValue, rlBuf, 16)
         return NumGet(rlBuf, 16, "Ptr")
     }
 

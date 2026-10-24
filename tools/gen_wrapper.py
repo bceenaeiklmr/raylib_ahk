@@ -737,7 +737,8 @@ def emit_ahk(version, layout, buckets, plans, buffers, header_text):
     add("; returns one gives back an array: pos := RL.GetMousePosition().")
     add("; Fields of a nested struct carry their path in the accessor name, so the camera")
     add("; position is RL.Camera3D_PositionX(cam) and a render texture's color buffer is")
-    add("; RL.RenderTexture2D_TextureId(rt). A field that is a pointer in C gives back the")
+    add("; RL.RenderTexture2D_TextureId(rt). Pass a second argument to write the field:")
+    add("; RL.Texture_Width(tex, 320). A field that is a pointer in C gives back the")
     add("; address, which any method taking that struct accepts: RL.SetMaterialTexture(")
     add("; RL.Model_Materials(model), RL.MATERIAL_MAP_DIFFUSE, tex).")
     add("; Every struct that DllCall could not pass goes through raylib_ahk_shim.dll, which")
@@ -788,8 +789,13 @@ def emit_ahk(version, layout, buckets, plans, buffers, header_text):
         for label in sorted([name] + names_of.get(name, [])):
             add("    static %s_Size := %d" % (label, layout.size(name)))
             for item in flat_fields(layout, name):
-                add("    static %s_%s(rlBuf) {\n        return NumGet(rlBuf, %d, \"%s\")\n    }"
-                    % (label, item["name"], item["off"], item["dt"]))
+                # One method reads and writes: an empty rlValue means read. Zero is a
+                # legitimate value and stays distinct from "" in AutoHotkey v2.
+                add("    static %s_%s(rlBuf, rlValue := \"\") {" % (label, item["name"]))
+                add("        if (rlValue != \"\")")
+                add("            NumPut(\"%s\", rlValue, rlBuf, %d)" % (item["dt"], item["off"]))
+                add("        return NumGet(rlBuf, %d, \"%s\")" % (item["off"], item["dt"]))
+                add("    }")
 
     add("")
     add("    ; Compares the accessors above with sizeof()/offsetof() compiled into the shim.")

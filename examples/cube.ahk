@@ -1,4 +1,5 @@
-﻿; Textured 3D cube, orbiting camera, and a Hungarian caption from a system TTF.
+﻿; Textured 3D cube, orbiting camera, and a caption with special characters drawn
+; by a system TrueType.
 ; Everything in this file needs the generated shim: Texture, Mesh, Model, Font and
 ; Camera3D are structs too big for DllCall to pass.
 ;
@@ -11,32 +12,11 @@
 #Warn All, StdOut
 #SingleInstance Force
 
-OnError(CubeErrorHandler)
-
 #Include ..\lib\raylib.ahk
-
-AutoExit := 0, ShotName := ""
-for Arg in A_Args {
-    if (SubStr(Arg, 1, 5) = "/auto") {
-        Colon := InStr(Arg, ":")
-        AutoExit := Colon ? Integer(SubStr(Arg, Colon + 1)) : 3000
-    } else if (SubStr(Arg, 1, 5) = "/shot") {
-        Colon := InStr(Arg, ":")
-        ShotName := Colon ? SubStr(Arg, Colon + 1) : "cube"
-    }
-}
-if (ShotName != "" && !InStr(ShotName, "."))
-    ShotName .= ".png"   ; raylib picks the format from the extension
-ShotPath := ""
-if (ShotName != "") {
-    ; Set the directory before InitWindow (raylib keeps a copy of it) and let
-    ; A_WorkingDir resolve the "..", so the path handed to ScreenShot is plain.
-    SetWorkingDir A_ScriptDir "\..\tests\out"
-    ShotPath := A_WorkingDir "\" ShotName
-}
+#Include harness.ahk
 
 Width := 800, Height := 480
-Caption := "A kocka forog - o, u, oe, ue: ő ű Ő Ű"
+Caption := "Spinning cube - special characters: é ë ö Ö ü Ü ő ű ß ñ € ½ ± °"
 
 ; vsync paces the loop better than SetTargetFPS, which overshoots its budget on
 ; Windows because the sleep clock ticks every ~15.6 ms.
@@ -78,12 +58,7 @@ StartTick := A_TickCount
 while !RL.WindowShouldClose() {
     RenderFrame()
     if (AutoExit && A_TickCount - StartTick >= AutoExit) {
-        if (ShotPath != "") {
-            ; ScreenShot() takes a full path, which TakeScreenshot() refuses: it only
-            ; accepts a bare name and writes it next to where the process started.
-            RenderFrame()
-            RL.ScreenShot(ShotPath)
-        }
+        Shoot(RenderFrame)
         break
     }
 }
@@ -118,26 +93,6 @@ RenderFrame() {
         RL.DrawText(Caption, 16, 12, 24, RL.DARKGRAY)
     }
     RL.DrawText("scroll to zoom, drag to look around", 16, Height - 32, 16, RL.GRAY)
-    RL.DrawFPS(Width - 100, 12)
+    RL.DrawFPS(Width - 100, Height - 32)
     RL.EndDrawing()
-}
-
-; Any TrueType on the system will do; arial first because it is always there.
-FindTtf() {
-    static Names := ["arial.ttf", "segoeui.ttf", "tahoma.ttf", "calibri.ttf", "cour.ttf"]
-    for Name in Names {
-        if FileExist(A_WinDir "\Fonts\" Name)
-            return A_WinDir "\Fonts\" Name
-    }
-    Loop Files A_WinDir "\Fonts\*.ttf" {
-        return A_LoopFileFullPath
-    }
-    return ""
-}
-
-CubeErrorHandler(err, mode) {
-    FileAppend("[ERROR] " err.Message "`n"
-        . "File: " err.File " (Line " err.Line ")`n"
-        . "Stack:`n" err.Stack "`n", "**")
-    ExitApp(1)
 }

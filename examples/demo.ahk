@@ -10,29 +10,8 @@
 #Warn All, StdOut
 #SingleInstance Force
 
-OnError(HeadlessErrorHandler)
-
 #Include ..\lib\raylib.ahk
-
-AutoExit := 0, ShotName := ""
-for Arg in A_Args {
-    if (SubStr(Arg, 1, 5) = "/auto") {
-        Colon := InStr(Arg, ":")
-        AutoExit := Colon ? Integer(SubStr(Arg, Colon + 1)) : 3000
-    } else if (SubStr(Arg, 1, 5) = "/shot") {
-        Colon := InStr(Arg, ":")
-        ShotName := Colon ? SubStr(Arg, Colon + 1) : "demo"
-    }
-}
-if (ShotName != "" && !InStr(ShotName, "."))
-    ShotName .= ".png"   ; raylib picks the format from the extension
-ShotPath := ""
-if (ShotName != "") {
-    ; Set the directory before InitWindow (raylib keeps a copy of it) and let
-    ; A_WorkingDir resolve the "..", so the path handed to ScreenShot is plain.
-    SetWorkingDir A_ScriptDir "\..\tests\out"
-    ShotPath := A_WorkingDir "\" ShotName
-}
+#Include harness.ahk
 
 Width := 960, Height := 540
 FloorY := Height - 46
@@ -133,12 +112,7 @@ while !RL.WindowShouldClose() {
     RenderFrame(Dt)
 
     if (AutoExit && A_TickCount - StartTick >= AutoExit) {
-        if (ShotPath != "") {
-            ; ScreenShot() takes a full path; TakeScreenshot() only accepts a bare
-            ; name and writes it beside wherever the process was started.
-            RenderFrame(Dt)
-            RL.ScreenShot(ShotPath)
-        }
+        Shoot(() => RenderFrame(Dt))
         break
     }
 }
@@ -185,11 +159,4 @@ RenderFrame(Dt) {
         10, Height - 24, 16, RL.GRAY)
     RL.DrawFPS(Width - 90, 10)
     RL.EndDrawing()
-}
-
-HeadlessErrorHandler(err, mode) {
-    FileAppend("[ERROR] " err.Message "`n"
-        . "File: " err.File " (Line " err.Line ")`n"
-        . "Stack:`n" err.Stack "`n", "**")
-    ExitApp(1)
 }
