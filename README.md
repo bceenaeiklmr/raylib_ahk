@@ -8,8 +8,8 @@ and draw with hardware-accelerated shapes and text:
 #Requires AutoHotkey v2.0
 #Include ..\lib\raylib.ahk
 
+RL.SetConfigFlags(RL.FLAG_VSYNC_HINT)   ; see "Behaviour worth knowing"
 RL.InitWindow(800, 450, "raylib + AutoHotkey")
-RL.SetTargetFPS(60)
 
 while !RL.WindowShouldClose() {
     RL.BeginDrawing()
@@ -31,8 +31,10 @@ Run it (the `/ErrorStdOut` keeps load errors on the console instead of a dialog)
 
 `examples\demo.ahk` is a small physics toy: WASD/arrows nudge the ball, holding
 the left mouse button springs it towards the cursor, `C` changes color, `R`
-resets, `Esc` quits. It also runs unattended for automation: `/auto:2000` closes
-after 2 seconds, `/shot:name.png` writes a framebuffer capture before closing.
+resets, `Esc` quits, and a ball that comes to rest gets pushed again after a
+moment so the scene never sits still. It also runs unattended for automation:
+`/auto:2000` closes after 2 seconds, `/shot:name.png` writes a framebuffer
+capture before closing.
 
 ## Layout
 
@@ -113,6 +115,9 @@ through `RL.Raw()` with an explicit integer return type.
 
 - **Strings are UTF-8.** The wrapper converts AHK's UTF-16 to UTF-8 on the way in
   (`"AStr"` would use the system codepage and mangle non-ASCII) and back on the way out.
+- **`SetTargetFPS(60)` undershoots on Windows.** Its wait rounds up to the ~15.6 ms
+  timer tick, so frames land at ~24 ms (about 41 fps) with visible jitter. The demo
+  uses `FLAG_VSYNC_HINT` and lets the display set the pace instead.
 - **The default font is ASCII only.** UTF-8 reaches raylib intact, but glyphs
   above codepoint 126 come out as blanks until you load a font, and `LoadFontEx`
   returns a `Font` struct, which `DllCall` cannot receive. Use `DrawText` with

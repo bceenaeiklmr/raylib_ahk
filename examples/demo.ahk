@@ -38,9 +38,10 @@ PushVY := 900.0
 Palette := [RL.MAROON, RL.SKYBLUE, RL.GOLD, RL.LIME, RL.PURPLE, RL.ORANGE]
 Pen := 1
 
-RL.SetConfigFlags(RL.FLAG_WINDOW_RESIZABLE)
+; Vsync tracks the display refresh. SetTargetFPS(60) instead waits on the ~15.6 ms
+; Windows timer tick and lands at ~24 ms per frame, about 41 fps with jitter.
+RL.SetConfigFlags(RL.FLAG_WINDOW_RESIZABLE | RL.FLAG_VSYNC_HINT)
 RL.InitWindow(Width, Height, "raylib.ahk demo  -  WASD/arrows nudge, hold left mouse to fling, C color, R reset, Esc quits")
-RL.SetTargetFPS(60)
 Reset()
 StartTick := A_TickCount
 ParkedSince := A_TickCount
