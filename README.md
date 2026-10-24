@@ -217,7 +217,17 @@ powershell -ExecutionPolicy Bypass -File tools\check_all.ps1    # everything, en
 Building the shim needs a C compiler and the raylib **DLL**, never `raylib.lib` — linking the
 static library would embed a second copy of raylib with its own window and GL context.
 
-## Gotchas found the hard way
+## Gotchas
+
+- The interpreter's own switches go **before** the script, the script's own arguments
+  **after** it: `AutoHotkey64.exe /ErrorStdOut examples\demo.ahk /auto:2500 /shot:demo`.
+  A `/switch` that appears before the script name is taken for the script path, and the run
+  dies with `C:\auto:2500 ... Script file not found` while an unwary shell reports success.
+- `AutoHotkey64.exe` is a GUI-subsystem program, so PowerShell's `&` operator neither waits
+  for it nor sets `$LASTEXITCODE` from it; a step that inherited the previous step's exit
+  code once certified seven demos that never started. `tools\run_ahk.ps1` and `Run-Ahk` in
+  `tools\check_all.ps1` wait for the process and report its real code.
+ found the hard way
 
 - **`Array.Delete(pos)` does not shorten an array.** It marks the slot and leaves `Length`
   alone, so a `while arr.Length > n` trim loop after `Delete(1)` spins forever and the window

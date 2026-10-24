@@ -44,7 +44,7 @@ $bat = Join-Path $build "compile.bat"
     'lib /nologo /def:"' + (Join-Path $root "vendor\raylib.def") + '" /machine:x64' +
         ' /out:"' + $implib + '" || exit /b 1'
     'cl /nologo /MT /O2 /W3 /D_CRT_SECURE_NO_WARNINGS /LD "' + (Join-Path $root "vendor\shim.c") + '"' +
-        ' /Fe:"' + $dll + '" /link /IMPLIB:"' + (Join-Path $build "raylib_ahk_shim.lib") + '"' +
+        ' /Fe:"' + $dll + '" /link /Brepro /IMPLIB:"' + (Join-Path $build "raylib_ahk_shim.lib") + '"' +
         ' "' + $implib + '" || exit /b 1'
 ) | Set-Content $bat -Encoding Ascii
 
@@ -58,5 +58,9 @@ try {
 Remove-Item "$build\shim.obj", $bat -Force -ErrorAction SilentlyContinue
 if ($code -ne 0) { throw "the build failed with exit code $code" }
 
-Write-Host ("lib\raylib_ahk_shim.dll  {0:N0} bytes" -f (Get-Item $dll).Length)
+# /Brepro leaves the timestamp out of the image, so rebuilding the same shim.c produces
+# the same bytes. The DLL is committed, and a build that rewrote it every time would
+# leave the working tree permanently dirty and the diff useless.
+Write-Host ("lib\raylib_ahk_shim.dll  {0:N0} bytes  sha256 {1}" -f (Get-Item $dll).Length,
+    (Get-FileHash $dll -Algorithm SHA256).Hash)
 Write-Host "regenerate both with:  python tools\gen_wrapper.py  &&  powershell tools\build_shim.ps1"
