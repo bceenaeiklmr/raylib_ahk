@@ -1,0 +1,4 @@
+# test and demo output
+tests/out/
+examples/*.png
+*.log
