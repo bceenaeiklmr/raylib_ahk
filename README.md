@@ -195,6 +195,7 @@ non-zero instead of leaving a frozen window behind.
 | [`input.ahk`](examples/input.ahk) | held-key panel, UTF-8 text gathered from `GetKeyPressed`, the five mouse buttons, wheel zoom, cursor visibility, gamepad buttons and axes that appear when a pad is plugged in |
 | [`paddle.ahk`](examples/paddle.ahk) | a playable brick game: delta-time physics, `CheckCollisionCircleRec`, a new angle depending on where the ball meets the paddle, score and lives, two sound effects synthesised as WAV bytes in RAM |
 | [`cube.ahk`](examples/cube.ahk) | 3D orbital camera, a RAM texture mapped onto a model with `SetMaterialTexture`, and a caption of special characters drawn twice: correctly by the TTF, and by the built-in font |
+| [`witch_rush/`](examples/witch_rush/witch_rush.ahk) | *Junk Food Witch: Broom Rush*: a playable 2D retro arcade game featuring procedural pixel art sprites, in-memory sound synthesis, BGM streaming, dash mechanics, and score tracking |
 
 ## Tests
 

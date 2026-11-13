@@ -21,7 +21,7 @@ tracked = subprocess.run(["git", "ls-files"], capture_output=True, text=True).st
 problems = []
 
 for path in tracked:
-    if path.endswith((".dll", ".png")):
+    if path.endswith((".dll", ".png", ".wav")):
         continue
     with open(path, "rb") as handle:
         raw = handle.read()
